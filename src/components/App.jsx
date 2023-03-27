@@ -1,5 +1,6 @@
 import "../index.css";
 import { useEffect, useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Footer from "./Footer";
 import Header from "./Header";
 import Main from "./Main";
@@ -8,17 +9,35 @@ import ImagePopup from "./ImagePopup";
 import EditProfilePopup from "./EditProfilePopup";
 import EditAvatarPopup from "./EditAvatarPopup";
 import AddPlacePopup from "./AddPlacePopup";
+import Login from "./Login";
+import Register from "./Register";
+import ProtectedRouteElement from "./ProtectedRoute";
 import api from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
+import InfoTooltip from "./InfoTooltip";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+
+  const [isRegistrationPopupOpen, setIsRegistrationPopupOpen] = useState(false);
+  const [isLoginPopupOpen, setLoginPopupOpen] = useState(false);
+
   const [selectedCard, setSelectedCard] = useState({});
 
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
+
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  function handleRegistrationClick() {
+    setIsRegistrationPopupOpen(true);
+  }
+
+  function handleLoginClick() {
+    setLoginPopupOpen(true);
+  }
 
   function handleEditAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -36,6 +55,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
+    setIsRegistrationPopupOpen(false);
     setSelectedCard({});
   }
 
@@ -142,8 +162,7 @@ function App() {
   return (
     <CurrentUserContext.Provider value={{ currentUser }}>
       <Header />
-
-      <Main
+      {/* <Main
         onEditProfile={handleEditProfileClick}
         onAddPlace={handleAddPlaceClick}
         onEditAvatar={handleEditAvatarClick}
@@ -151,9 +170,42 @@ function App() {
         onCardLike={handleCardLike}
         onCardDelete={handleCardDelete}
         cards={cards}
-      />
+      /> */}
+
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRouteElement
+              element={Main}
+              loggedIn={loggedIn}
+              onEditProfile={handleEditProfileClick}
+              onAddPlace={handleAddPlaceClick}
+              onEditAvatar={handleEditAvatarClick}
+              onCardClick={handleCardClick}
+              onCardLike={handleCardLike}
+              onCardDelete={handleCardDelete}
+              cards={cards}
+            />
+          }
+        />
+        <Route
+          path="/sign-up"
+          element={<Register onOpenStatusPopup={handleRegistrationClick} />}
+          loggedIn={loggedIn}
+        />
+        <Route path="/sign-in" element={<Login />} loggedIn={loggedIn} />
+      </Routes>
 
       <Footer />
+
+      <InfoTooltip
+        isOpen={isRegistrationPopupOpen}
+        onClose={closeAllPopups}
+        name="Что-то пошло не так!/n
+Попробуйте ещё раз."
+        // src={}
+      />
 
       <ImagePopup
         card={selectedCard}
