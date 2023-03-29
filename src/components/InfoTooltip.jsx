@@ -1,5 +1,7 @@
 import React from "react";
 import { useRef, useEffect } from "react";
+import popupNo from "../blocks/popup/img/popupNo.svg";
+import popupOk from "../blocks/popup/img/popupOk.svg";
 
 function InfoTooltip(props) {
   return (
@@ -15,9 +17,15 @@ function InfoTooltip(props) {
           type="button"
           onClick={props.onClose}
         ></button>
-        {/* <img src="${props.src}" /> */}
-        <img src="../img/popup-no.svg" />
-        <h2 className="popup__title">{`${props.title}`}</h2>
+        <img
+          className="popup__icon"
+          src={props.successful ? popupOk : popupNo}
+        />
+        <h2 className="popup__title popup__title_center-position">{`${
+          props.successful
+            ? "Вы успешно зарегистрировались!"
+            : "Что-то пошло не так! Попробуйте ещё раз."
+        }`}</h2>
       </div>
     </div>
   );

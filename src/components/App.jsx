@@ -1,6 +1,6 @@
 import "../index.css";
 import { useEffect, useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
 import Header from "./Header";
 import Main from "./Main";
@@ -15,6 +15,9 @@ import ProtectedRouteElement from "./ProtectedRoute";
 import api from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import InfoTooltip from "./InfoTooltip";
+import popupNo from "../blocks/popup/img/popupNo.svg";
+import popupOk from "../blocks/popup/img/popupOk.svg";
+import { register, authorize, getContent } from "./Auth";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -30,13 +33,63 @@ function App() {
   const [cards, setCards] = useState([]);
 
   const [loggedIn, setLoggedIn] = useState(false);
+  const [userData, setUserData] = useState("");
 
-  function handleRegistrationClick() {
-    setIsRegistrationPopupOpen(true);
+  const [successful, setSuccessful] = useState(false);
+  const [email, setEmail] = useState("");
+  const [popupOpen, setPopupOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    tokenCheck();
+  }, []);
+
+  const tokenCheck = () => {
+    const jwt = localStorage.getItem("jwt");
+    if (jwt) {
+      getContent(jwt).then((res) => {
+        if (res) {
+          setLoggedIn(true);
+          setUserData(res.data.email);
+          setEmail(res.data.email);
+          navigate("/", { replace: true });
+        }
+      });
+    }
+  };
+
+  function signOut() {
+    localStorage.removeItem("jwt");
   }
 
-  function handleLoginClick() {
-    setLoginPopupOpen(true);
+  function handleRegistrationClick(email, password) {
+    register(email, password)
+      .then((res) => {
+        if (res) {
+          setSuccessful(true);
+          localStorage.setItem("jwt", res.token);
+          setPopupOpen(true);
+        }
+      })
+      .catch((err) => {
+        setPopupOpen(true);
+        setSuccessful(false);
+      });
+  }
+
+  function handleLoginClick(email, password) {
+    authorize(email, password)
+      .then((res) => {
+        if (res) {
+          setLoggedIn(true);
+          setEmail(email);
+          localStorage.setItem("jwt", res.token);
+        }
+      })
+      .catch((err) => {
+        setPopupOpen(true);
+      });
   }
 
   function handleEditAvatarClick() {
@@ -55,7 +108,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
-    setIsRegistrationPopupOpen(false);
+    setPopupOpen(false);
     setSelectedCard({});
   }
 
@@ -161,17 +214,7 @@ function App() {
 
   return (
     <CurrentUserContext.Provider value={{ currentUser }}>
-      <Header />
-      {/* <Main
-        onEditProfile={handleEditProfileClick}
-        onAddPlace={handleAddPlaceClick}
-        onEditAvatar={handleEditAvatarClick}
-        onCardClick={handleCardClick}
-        onCardLike={handleCardLike}
-        onCardDelete={handleCardDelete}
-        cards={cards}
-      /> */}
-
+      <Header userData={userData} isSignOut={signOut} />
       <Routes>
         <Route
           path="/"
@@ -191,20 +234,25 @@ function App() {
         />
         <Route
           path="/sign-up"
-          element={<Register onOpenStatusPopup={handleRegistrationClick} />}
+          element={<Register handleRegistration={handleRegistrationClick} />}
           loggedIn={loggedIn}
         />
-        <Route path="/sign-in" element={<Login />} loggedIn={loggedIn} />
+        <Route
+          path="/sign-in"
+          element={<Login handleLogin={handleLoginClick} />}
+          loggedIn={loggedIn}
+        />
       </Routes>
 
       <Footer />
 
       <InfoTooltip
-        isOpen={isRegistrationPopupOpen}
+        isOpen={popupOpen}
+        name="info"
         onClose={closeAllPopups}
-        name="Что-то пошло не так!/n
-Попробуйте ещё раз."
-        // src={}
+        title="Вы успешно зарегистрировались!"
+        icon={popupOk}
+        isSuccess={successful}
       />
 
       <ImagePopup

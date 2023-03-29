@@ -9,3 +9,7 @@
   margin: 0 0 43px 0;
   padding: 0 0 13px 0;
 }
+
+.main-form__input:last-child {
+  margin-bottom: 0;
+}
