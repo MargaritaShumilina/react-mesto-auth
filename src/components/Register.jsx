@@ -1,11 +1,8 @@
 import React from "react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { register } from "./Auth";
+import { Link } from "react-router-dom";
 
 function Register(props) {
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,9 +16,7 @@ function Register(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    register(email, password).then((res) => {
-      navigate("/sign-in", { replace: true });
-    });
+    props.handleRegistration(email, password);
   }
 
   return (

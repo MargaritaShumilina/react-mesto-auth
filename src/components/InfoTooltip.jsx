@@ -1,15 +1,14 @@
 import React from "react";
-import { useRef, useEffect } from "react";
 import popupNo from "../blocks/popup/img/popupNo.svg";
 import popupOk from "../blocks/popup/img/popupOk.svg";
 
 function InfoTooltip(props) {
+  console.log("Called");
   return (
     <div
       className={`popup popup-${props.name} ${
         props.isOpen ? "popup_opened" : ""
       }`}
-      onClick={props.onClick}
     >
       <div className={`popup__container popup-${props.name}__container`}>
         <button
@@ -19,7 +18,7 @@ function InfoTooltip(props) {
         ></button>
         <img
           className="popup__icon"
-          src={props.successful ? popupOk : popupNo}
+          src={`${props.successful ? popupOk : popupNo}`}
         />
         <h2 className="popup__title popup__title_center-position">{`${
           props.successful

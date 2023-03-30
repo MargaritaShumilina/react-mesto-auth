@@ -15,17 +15,12 @@ import ProtectedRouteElement from "./ProtectedRoute";
 import api from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import InfoTooltip from "./InfoTooltip";
-import popupNo from "../blocks/popup/img/popupNo.svg";
-import popupOk from "../blocks/popup/img/popupOk.svg";
 import { register, authorize, getContent } from "./Auth";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
-
-  const [isRegistrationPopupOpen, setIsRegistrationPopupOpen] = useState(false);
-  const [isLoginPopupOpen, setLoginPopupOpen] = useState(false);
 
   const [selectedCard, setSelectedCard] = useState({});
 
@@ -51,15 +46,17 @@ function App() {
       getContent(jwt).then((res) => {
         if (res) {
           setLoggedIn(true);
-          setUserData(res.data.email);
-          setEmail(res.data.email);
           navigate("/", { replace: true });
         }
       });
     }
   };
 
+  //Прошу прощения за безобразие в коде, очень торопилась :) Буду благодарна за все замечания )
+
   function signOut() {
+    setLoggedIn(false);
+    setUserData("");
     localStorage.removeItem("jwt");
   }
 
@@ -67,14 +64,16 @@ function App() {
     register(email, password)
       .then((res) => {
         if (res) {
-          setSuccessful(true);
-          localStorage.setItem("jwt", res.token);
           setPopupOpen(true);
+          setSuccessful(true);
+          navigate("/sign-in", { replace: true });
+        } else {
+          setPopupOpen(true);
+          setSuccessful(false);
         }
       })
       .catch((err) => {
-        setPopupOpen(true);
-        setSuccessful(false);
+        console.log(err);
       });
   }
 
@@ -83,12 +82,16 @@ function App() {
       .then((res) => {
         if (res) {
           setLoggedIn(true);
-          setEmail(email);
+          setUserData(email);
           localStorage.setItem("jwt", res.token);
+          navigate("/", { replace: true });
+        } else {
+          setPopupOpen(true);
+          setSuccessful(false);
         }
       })
       .catch((err) => {
-        setPopupOpen(true);
+        console.log(err);
       });
   }
 
@@ -250,9 +253,7 @@ function App() {
         isOpen={popupOpen}
         name="info"
         onClose={closeAllPopups}
-        title="Вы успешно зарегистрировались!"
-        icon={popupOk}
-        isSuccess={successful}
+        successful={successful}
       />
 
       <ImagePopup

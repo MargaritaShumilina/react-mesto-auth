@@ -3,6 +3,10 @@
 @import url("../src/blocks/body/body.css");
 
 @import url("../src/blocks/header/header.css");
+@import url("../src/blocks/header/header__navigation/header__navigation.css");
+@import url("../src/blocks/header/header__navigation/_email/header__navigation_email.css");
+@import url("../src/blocks/header/header__navigation/_login/header__navigation_login.css");
+@import url("../src/blocks/header/header__navigation/_logout/header__navigation_logout.css");
 
 @import url("../src/blocks/logo/logo.css");
 

@@ -1,11 +1,7 @@
 import React from "react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { authorize } from "./Auth";
 
 function Login(props) {
-  const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,10 +15,10 @@ function Login(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    authorize(email, password).then((res) => {
-      props.handleLogin();
-      navigate("/", { replace: true });
-    });
+    if (!email || !password) {
+      return;
+    }
+    props.handleLogin(email, password);
   }
 
   return (

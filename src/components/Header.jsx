@@ -2,19 +2,18 @@ import { Routes, Route, useNavigate, Link } from "react-router-dom";
 import logo from "../blocks/logo/img/logo.svg";
 
 function Header(props) {
-  function signOut() {
-    localStorage.removeItem("jwt");
-  }
-
   return (
     <header className="header">
       <img className="logo" src={logo} alt="Логотип" />
-      <div>
+      <div className="header__navigation_login">
+        {props.userData && (
+          <p className="header__navigation_email">{props.userData}</p>
+        )}
         <Routes>
           <Route
             path="/sign-up"
             element={
-              <Link to="/sign-in" className="">
+              <Link to="/sign-in" className="header__navigation">
                 Войти
               </Link>
             }
@@ -22,7 +21,7 @@ function Header(props) {
           <Route
             path="/sign-in"
             element={
-              <Link to="/sign-up" className="">
+              <Link to="/sign-up" className="header__navigation">
                 Зарегистрироваться
               </Link>
             }
@@ -30,14 +29,17 @@ function Header(props) {
           <Route
             path="/"
             element={
-              <Link to="/sign-in" onClick={props.isSignOut} className="">
+              <Link
+                to="/sign-in"
+                onClick={props.isSignOut}
+                className="header__navigation_logout"
+              >
                 Выйти
               </Link>
             }
           />
         </Routes>
       </div>
-      <p className="my-profile__value">{props.userData}</p>
     </header>
   );
 }

@@ -8,20 +8,16 @@ export const register = (email, password) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ email, password }),
-  })
-    .then((res) => {
-      try {
-        if (res.status === 200) {
-          return res.json();
-        }
-      } catch (e) {
-        return e;
+  }).then((res) => {
+    try {
+      if (res.status === 201) {
+        console.log(res);
+        return res.json();
       }
-    })
-    .then((res) => {
-      return res;
-    })
-    .catch((err) => console.log(err));
+    } catch (e) {
+      return e;
+    }
+  });
 };
 
 export const authorize = (email, password) => {
@@ -33,22 +29,14 @@ export const authorize = (email, password) => {
     },
     body: JSON.stringify({ email, password }),
   })
-    .then((res) => {
-      return res;
-    })
-
+    .then((response) => response.json())
     .then((data) => {
-      // сохраняем токен
-      localStorage.setItem("token", data.token);
-    });
-  // .then((response) => response.json())
-  // .then((data) => {
-  //   if (data.jwt) {
-  //     localStorage.setItem("jwt", data.jwt);
-  //     return data;
-  //   }
-  // })
-  // .catch((err) => console.log(err))
+      if (data.token) {
+        localStorage.setItem("jwt", data.token);
+        return data;
+      }
+    })
+    .catch((err) => console.log(err));
 };
 
 export const getContent = (token) => {
@@ -57,7 +45,7 @@ export const getContent = (token) => {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
+      Authorization: `Bearer ${localStorage.getItem(token)}`,
     },
   })
     .then((res) => res.json())
