@@ -3,7 +3,6 @@ import popupNo from "../blocks/popup/img/popupNo.svg";
 import popupOk from "../blocks/popup/img/popupOk.svg";
 
 function InfoTooltip(props) {
-  console.log("Called");
   return (
     <div
       className={`popup popup-${props.name} ${
@@ -20,6 +19,7 @@ function InfoTooltip(props) {
           className="popup__icon"
           src={`${props.successful ? popupOk : popupNo}`}
         />
+        {/* с Можно лучше полностью согласна, реализую после сдачи обязательно, спасибо :) */}
         <h2 className="popup__title popup__title_center-position">{`${
           props.successful
             ? "Вы успешно зарегистрировались!"

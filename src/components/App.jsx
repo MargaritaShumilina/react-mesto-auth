@@ -15,7 +15,7 @@ import ProtectedRouteElement from "./ProtectedRoute";
 import api from "../utils/api";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
 import InfoTooltip from "./InfoTooltip";
-import { register, authorize, getContent } from "./Auth";
+import { register, authorize, getContent } from "../utils/auth";
 
 function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
@@ -31,7 +31,6 @@ function App() {
   const [userData, setUserData] = useState("");
 
   const [successful, setSuccessful] = useState(false);
-  const [email, setEmail] = useState("");
   const [popupOpen, setPopupOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -43,16 +42,17 @@ function App() {
   const tokenCheck = () => {
     const jwt = localStorage.getItem("jwt");
     if (jwt) {
-      getContent(jwt).then((res) => {
-        if (res) {
-          setLoggedIn(true);
-          navigate("/", { replace: true });
-        }
-      });
+      getContent(jwt)
+        .then((res) => {
+          if (res) {
+            setUserData(res.data.email);
+            setLoggedIn(true);
+            navigate("/", { replace: true });
+          }
+        })
+        .catch((err) => console.log(err));
     }
   };
-
-  //Прошу прощения за безобразие в коде, очень торопилась :) Буду благодарна за все замечания )
 
   function signOut() {
     setLoggedIn(false);
@@ -65,14 +65,14 @@ function App() {
       .then((res) => {
         if (res) {
           setPopupOpen(true);
+          localStorage.setItem("jwt", res.token);
           setSuccessful(true);
           navigate("/sign-in", { replace: true });
-        } else {
-          setPopupOpen(true);
-          setSuccessful(false);
         }
       })
       .catch((err) => {
+        setPopupOpen(true);
+        setSuccessful(false);
         console.log(err);
       });
   }
@@ -85,12 +85,11 @@ function App() {
           setUserData(email);
           localStorage.setItem("jwt", res.token);
           navigate("/", { replace: true });
-        } else {
-          setPopupOpen(true);
-          setSuccessful(false);
         }
       })
       .catch((err) => {
+        setPopupOpen(true);
+        setSuccessful(false);
         console.log(err);
       });
   }
@@ -116,23 +115,27 @@ function App() {
   }
 
   useEffect(() => {
-    api
-      .getUserInformation()
-      .then((res) => {
-        setCurrentUser(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    if (loggedIn) {
+      api
+        .getUserInformation()
+        .then((res) => {
+          setCurrentUser(res);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }, []);
 
   useEffect(() => {
-    api
-      .getInitialCards()
-      .then(setCards)
-      .catch((error) => {
-        console.log(error);
-      });
+    if (loggedIn) {
+      api
+        .getInitialCards()
+        .then(setCards)
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }, []);
 
   function handleCardClick(card) {
